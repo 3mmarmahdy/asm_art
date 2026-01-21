@@ -9,6 +9,8 @@ use App\Http\Middleware\IsAdmin;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
+use App\Models\Category;
+use Illuminate\Support\Facades\Artisan;
 
 /*
 |--------------------------------------------------------------------------
@@ -107,4 +109,64 @@ Route::get('/fix-permissions', function () {
     } catch (\Exception $e) {
         return "حدث خطأ: " . $e->getMessage();
     }
+});
+
+Route::get('/run-setup', function () {
+    $report = [];
+    
+    // ----------------------------------------------------
+    // 1. إصلاح الصور (Storage Link)
+    // ----------------------------------------------------
+    try {
+        if (!file_exists(public_path('storage'))) {
+            Artisan::call('storage:link');
+            $report[] = "✅ تم ربط مجلد الصور (Storage Link) بنجاح.";
+        } else {
+            $report[] = "ℹ️ مجلد الصور مرتبط مسبقاً.";
+        }
+    } catch (\Exception $e) {
+        $report[] = "❌ فشل ربط الصور: " . $e->getMessage();
+    }
+
+    // ----------------------------------------------------
+    // 2. إضافة الأقسام (Categories)
+    // ----------------------------------------------------
+    try {
+        $categoriesList = ['أقلام فاخرة', 'أحبار ومستلزمات', 'ورق دفاتر', 'أطقم هدايا'];
+        
+        // تحديد اسم العمود الصحيح (name أو category_name)
+        $columnName = null;
+        if (Schema::hasColumn('categories', 'category_name')) {
+            $columnName = 'category_name';
+        } elseif (Schema::hasColumn('categories', 'name')) {
+            $columnName = 'name';
+        } elseif (Schema::hasColumn('categories', 'title')) {
+            $columnName = 'title';
+        }
+
+        if ($columnName) {
+            foreach ($categoriesList as $cat) {
+                Category::firstOrCreate([$columnName => $cat]);
+            }
+            $report[] = "✅ تم إضافة الأقسام التالية: " . implode('، ', $categoriesList);
+        } else {
+            $report[] = "❌ لم يتم العثور على اسم عمود مناسب في جدول Categories!";
+        }
+
+    } catch (\Exception $e) {
+        $report[] = "❌ خطأ في إضافة الأقسام: " . $e->getMessage();
+    }
+
+    // ----------------------------------------------------
+    // 3. تنظيف الكاش (Cache Clear)
+    // ----------------------------------------------------
+    try {
+        Artisan::call('optimize:clear');
+        $report[] = "✅ تم تنظيف الكاش وإعادة بناء الإعدادات.";
+    } catch (\Exception $e) {
+        $report[] = "⚠️ تنبيه الكاش: " . $e->getMessage();
+    }
+
+    // عرض النتيجة
+    return "<h1>تقرير الصيانة الشامل 🛠️</h1><ul><li>" . implode('</li><li>', $report) . "</li></ul><br><a href='/'>العودة للرئيسية</a>";
 });
