@@ -170,3 +170,11 @@ Route::get('/run-setup', function () {
     // عرض النتيجة
     return "<h1>تقرير الصيانة الشامل 🛠️</h1><ul><li>" . implode('</li><li>', $report) . "</li></ul><br><a href='/'>العودة للرئيسية</a>";
 });
+Route::get('/update-db', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate --force');
+        return '<h1 style="color:green; text-align:center;">✅ قاعدة البيانات جاهزة ومحدثة!</h1>';
+    } catch (\Exception $e) {
+        return '<h1 style="color:red; text-align:center;">❌ الحالة:</h1><pre>' . $e->getMessage() . '</pre>';
+    }
+});

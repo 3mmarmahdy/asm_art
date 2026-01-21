@@ -25,7 +25,7 @@ class ProductController extends Controller
     }
 
     // 3. حفظ المنتج
-    public function store(Request $request)
+   public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -36,14 +36,18 @@ class ProductController extends Controller
             'category_id' => 'required|exists:categories,id',
         ]);
 
-        $imagePath = $request->file('image')->store('products', 'public');
+        // تحويل الصورة إلى كود Base64
+        $path = $request->file('image')->getRealPath();
+        $logo = file_get_contents($path);
+        $base64 = base64_encode($logo);
+        $finalImage = 'data:image/' . $request->file('image')->extension() . ';base64,' . $base64;
 
         Product::create([
             'name' => $request->name,
             'price' => $request->price,
             'quantity' => $request->quantity,
             'description' => $request->description,
-            'image' => 'storage/' . $imagePath,
+            'image' => $finalImage,
             'category_id' => $request->category_id,
         ]);
 
@@ -84,14 +88,10 @@ class ProductController extends Controller
         ];
 
         if ($request->hasFile('image')) {
-            // حذف الصورة القديمة
-            if ($product->image && str_starts_with($product->image, 'storage/')) {
-                $oldPath = str_replace('storage/', '', $product->image);
-                Storage::disk('public')->delete($oldPath);
-            }
-            // رفع الجديدة
-            $path = $request->file('image')->store('products', 'public');
-            $data['image'] = 'storage/' . $path;
+            $path = $request->file('image')->getRealPath();
+            $logo = file_get_contents($path);
+            $base64 = base64_encode($logo);
+            $data['image'] = 'data:image/' . $request->file('image')->extension() . ';base64,' . $base64;
         }
 
         $product->update($data);
