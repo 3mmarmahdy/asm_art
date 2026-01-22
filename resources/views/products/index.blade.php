@@ -83,6 +83,13 @@
                     <a href="{{ route('products.show', $product->id) }}" class="block relative aspect-square rounded-2xl overflow-hidden bg-zinc-50 dark:bg-zinc-900 mb-3">
                         <img src="{{ $product->image }}" alt="{{ $product->name }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700">
                     </a>
+                    {{-- تنبيه المخزون المنخفض (يظهر للمدير فقط) --}}
+                    @if(auth()->check() && auth()->user()->is_admin && $product->quantity <= 15)
+                    <div class="absolute top-2 right-2 z-20 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full animate-pulse shadow-md flex items-center gap-1">
+                    <span class="material-icons text-[14px]">warning</span>
+                    <span>بقي {{ $product->quantity }} فقط!</span>
+                    </div>
+                    @endif
 
                     {{-- هنا كان الخطأ، تم التصحيح لاستخدام is_admin --}}
                     @if(auth()->check() && auth()->user()->is_admin)

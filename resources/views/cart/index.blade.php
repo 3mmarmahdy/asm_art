@@ -46,9 +46,12 @@
                     <span class="text-zinc-500 dark:text-zinc-400 font-bold">المجموع الكلي:</span>
                     <span class="text-2xl font-black text-zinc-900 dark:text-white">{{ $total }} <span class="text-sm font-normal text-zinc-500">ر.ي</span></span>
                 </div>
-                <a href="{{ route('checkout.index') }}" class="block w-full bg-primary text-black py-3.5 rounded-xl font-bold hover:bg-yellow-500 transition shadow-lg shadow-primary/20 text-center">
-                إتمام الشراء (Checkout)
-                </a>
+                <a href="{{ route('cart.checkout') }}" class="w-full block text-center bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl transition shadow-lg transform active:scale-95">
+                <div class="flex items-center justify-center gap-2">
+        <span class="material-icons">whatsapp</span>
+        <span>إتمام الطلب عبر واتساب</span>
+    </div>
+            </a>
             </div>
         </div>
 

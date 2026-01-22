@@ -178,3 +178,17 @@ Route::get('/update-db', function () {
         return '<h1 style="color:red; text-align:center;">❌ الحالة:</h1><pre>' . $e->getMessage() . '</pre>';
     }
 });
+// 1. الصفحة الرئيسية وصفحة التفاصيل (مفتوحة للجميع - Public)
+Route::get('/', [App\Http\Controllers\ProductController::class, 'index'])->name('products.index');
+Route::get('/products/{id}', [App\Http\Controllers\ProductController::class, 'show'])->name('products.show');
+Route::get('/search', [App\Http\Controllers\ProductController::class, 'search'])->name('products.search');
+
+// 2. مجموعة السلة والشراء (محمية - تتطلب تسجيل دخول)
+Route::middleware('auth')->group(function () {
+    
+    // بمجرد أن يحاول الدخول لأي رابط هنا وهو غير مسجل، لارافيل سيحوله لصفحة الدخول تلقائياً
+    Route::post('/cart/add/{id}', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add');
+    Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
+    Route::get('/checkout', [App\Http\Controllers\CartController::class, 'checkout'])->name('cart.checkout');
+    // ... وباقي راوتات الشراء والطلب
+});

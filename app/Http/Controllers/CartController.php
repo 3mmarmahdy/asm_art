@@ -75,4 +75,49 @@ class CartController extends Controller
         Cart::destroy($id);
         return redirect()->route('cart.index');
     }
+    // 4. إتمام الشراء والتحويل للواتساب (الدالة الجديدة)
+    public function checkout()
+    {
+        $userId = auth()->id();
+        
+        // جلب عناصر السلة
+        $cartItems = Cart::where('user_id', $userId)->with('product')->get();
+
+        if($cartItems->isEmpty()) {
+            return redirect()->back()->with('error', 'السلة فارغة!');
+        }
+
+        // حساب المجموع الكلي
+        $total = $cartItems->sum(function($item) {
+            return $item->product->price * $item->quantity;
+        });
+
+        // تجهيز نص رسالة الواتساب
+        $customerName = auth()->user()->name;
+        $orderDate = date('Y-m-d H:i');
+        
+        $msg = "مرحباً، طلب جديد من المتجر! 🛍️\n";
+        $msg .= "------------------------\n";
+        $msg .= "👤 العميل: *$customerName*\n";
+        $msg .= "📅 التاريخ: $orderDate\n";
+        $msg .= "💰 الإجمالي: *$total ريال*\n";
+        $msg .= "------------------------\n";
+        $msg .= "المنتجات:\n";
+
+        foreach($cartItems as $item) {
+            $msg .= "- " . $item->product->name . " (العدد: " . $item->quantity . ")\n";
+        }
+
+        $msg .= "\nيرجى تأكيد الطلب وتجهيزه.";
+
+        // رقمك (اليمن)
+        $myPhone = "967734464015";
+
+        // إفراغ السلة بعد إرسال الطلب (مهم جداً حتى لا يشتري نفس الأشياء مرتين)
+        Cart::where('user_id', $userId)->delete();
+
+        // التوجيه للواتساب
+        $whatsappUrl = "https://wa.me/$myPhone?text=" . urlencode($msg);
+        return redirect()->away($whatsappUrl);
+    }
 }
