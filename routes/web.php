@@ -192,3 +192,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/checkout', [App\Http\Controllers\CartController::class, 'checkout'])->name('cart.checkout');
     // ... وباقي راوتات الشراء والطلب
 });
+Route::get('/clear-cache', function() {
+    \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+    return '<h1>✅ تم تنظيف الكاش بنجاح!</h1>';
+});
