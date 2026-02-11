@@ -4,15 +4,7 @@
 
 <div class="sticky top-0 z-20 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800 p-4 pb-3">
     <div class="flex items-center justify-between gap-3">
-        <form action="{{ route('products.search') }}" method="GET" class="flex-1">
-            <div class="relative group">
-                <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                    <span class="material-symbols-outlined text-zinc-400 group-focus-within:text-primary transition">search</span>
-                </span>
-                <input type="text" name="query" placeholder="ابحث عن..." 
-                       class="w-full bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white rounded-full py-2.5 pl-10 pr-4 outline-none border border-zinc-200 dark:border-zinc-700 focus:border-primary focus:ring-1 focus:ring-primary transition text-sm shadow-sm">
-            </div>
-        </form>
+        <livewire:search-products />
         <button class="flex items-center justify-center text-zinc-600 dark:text-zinc-300 relative w-10 h-10 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition">
             <span class="material-symbols-outlined">notifications</span>
             <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white dark:border-zinc-900"></span>

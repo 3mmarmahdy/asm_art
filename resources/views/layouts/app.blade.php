@@ -35,6 +35,7 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
+    @livewireStyles
 </head>
 
 <body class="bg-background-light dark:bg-background-dark font-display text-zinc-900 dark:text-white pb-24">
@@ -101,16 +102,7 @@
                 </a>
             @endif
 
-            <a href="{{ route('cart.index') }}" class="relative flex flex-col items-center gap-1 text-zinc-500 dark:text-zinc-400 hover:text-primary transition">
-                <span class="material-symbols-outlined">shopping_cart</span>
-                <span class="text-[10px] font-medium">السلة</span>
-                {{-- عرض العداد فقط إذا كان أكبر من صفر --}}
-                @if(isset($cartCount) && $cartCount > 0)
-                <span class="absolute -top-2 -right-2 w-5 h-5 bg-red-600 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-white dark:border-zinc-900 animate-bounce">
-                {{ $cartCount }}
-                </span>
-                @endif
-            </a>
+            <livewire:cart-counter />
             
             @auth
                 <form action="{{ route('logout') }}" method="POST" class="flex flex-col items-center gap-1">
@@ -129,6 +121,6 @@
 
         </div>
     </div>
-
+        @livewireScripts
 </body>
 </html>
